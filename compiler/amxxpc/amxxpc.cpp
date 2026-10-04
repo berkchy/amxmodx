@@ -51,6 +51,10 @@ int main(int argc, char **argv)
 	HINSTANCE lib = NULL;
 	if (FileExists("./amxxpc32.so"))
 		lib = dlmount("./amxxpc32.so");
+	else if (FileExists("./libamxxpc32.so"))
+		lib = dlmount("./libamxxpc32.so");
+	else if (FileExists("libamxxpc32.so"))
+		lib = dlmount("libamxxpc32.so");
 	else
 		lib = dlmount("amxxpc32.so");
 # elif defined(__APPLE__)
