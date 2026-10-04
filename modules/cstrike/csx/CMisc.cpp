@@ -13,6 +13,7 @@
 
 #include "CMisc.h"
 #include "rank.h"
+#include <cstdio>
 
 // *****************************************************
 // class Grenades
@@ -86,7 +87,7 @@ void CPlayer::Disconnect(){
 	rank = 0;
 }
 
-void CPlayer::PutInServer(){
+void CPlayer::PutInServer(const char* nameOverride){
 
 	//if ( ignoreBots(pEdict) )
 	if ( (int)csstats_rankbots->value == 0 &&
@@ -94,7 +95,18 @@ void CPlayer::PutInServer(){
 		return;
 
 	restartStats();
-	const char* name = STRING(pEdict->v.netname);
+	// The edict netname is unreliable for fake clients: a nonzero string id
+	// can still resolve via STRING() to a wild pointer and crash in strlen().
+	// Always use the caller-supplied infobuffer name (valid C string); fall
+	// back to a synthesized placeholder -- never dereference the edict
+	// netname here.
+	char tmpname[32];
+	const char* name = nameOverride;
+	if ( !name || !*name )
+	{
+		snprintf(tmpname, sizeof(tmpname), "Player#%d", index);
+		name = tmpname;
+	}
 	const char* unique = name;
 	bool isip = false;
 	switch((int)csstats_rank->value) {
@@ -106,6 +118,10 @@ void CPlayer::PutInServer(){
 		unique = ip;
 		isip = true;
 	}
+	if ( !name )
+		name = "";
+	if ( !unique )
+		unique = name;
 	rank = g_rank.findEntryInRank( unique , name , isip);
 }
 

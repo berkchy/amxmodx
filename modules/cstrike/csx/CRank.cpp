@@ -64,6 +64,8 @@ RankSystem::RankStats::~RankStats() {
 }
 
 void RankSystem::RankStats::setName( const char* nn  )	{
+	if ( !nn )
+		nn = "";
 	delete[] name;
 	namelen = strlen(nn) + 1;
 	name = new char[namelen];
@@ -74,6 +76,8 @@ void RankSystem::RankStats::setName( const char* nn  )	{
 }
 
 void RankSystem::RankStats::setUnique( const char* nn  )	{
+	if ( !nn )
+		nn = "";
 	delete[] unique;
 	uniquelen = strlen(nn) + 1;
 	unique = new char[uniquelen];

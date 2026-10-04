@@ -219,7 +219,30 @@ void ClientDisconnect( edict_t *pEntity )
 
 void ClientPutInServer_Post( edict_t *pEntity ) 
 {
-	GET_PLAYER_POINTER(pEntity)->PutInServer();
+	if ( pEntity )
+	{
+		int idx = ENTINDEX(pEntity);
+
+		// Hook chains (e.g. yapb) may forward edicts that are not fully
+		// spawned player edicts yet. Indexing players[] with a bad index
+		// yields a wild CPlayer whose strings crash strlen() in rank code.
+		if ( idx >= 1 && idx <= gpGlobals->maxClients )
+		{
+			CPlayer *pPlayer = GET_PLAYER_POINTER_I(idx);
+
+			// Use the fresh edict from the engine, not the one stored at
+			// ServerActivate time (it may be stale for late-joining bots).
+			pPlayer->pEdict = pEntity;
+
+			// The edict netname may be null/stale for spawning bots;
+			// the infobuffer name is always a valid C string.
+			const char* ibname = NULL;
+			char* ib = GET_INFOKEYBUFFER(pEntity);
+			if ( ib )
+				ibname = INFOKEY_VALUE(ib, "name");
+			pPlayer->PutInServer(ibname);
+		}
+	}
 
 	RETURN_META(MRES_IGNORED);
 }
@@ -232,11 +255,14 @@ void ClientUserInfoChanged_Post( edict_t *pEntity, char *infobuffer ) {
 		pPlayer->Init(ENTINDEX(pEntity), pEntity);
 	}
 
-	const char* name = INFOKEY_VALUE(infobuffer,"name");
-	const char* oldname = STRING(pEntity->v.netname);
+	const char* name = (infobuffer) ? INFOKEY_VALUE(infobuffer,"name") : NULL;
+	// Never resolve the edict netname here: for fake clients a nonzero
+	// string id can still resolve via STRING() to wild memory and crash in
+	// strcmp(). Compare against the rank entry's own stored name instead.
+	const char* oldname = (pPlayer->rank) ? pPlayer->rank->getName() : NULL;
 
 	if ( pPlayer->rank ){
-		if ( strcmp(oldname,name) != 0 ) {
+		if ( !oldname || !*oldname || !name || !*name || strcmp(oldname,name) != 0 ) {
 			if ((int)csstats_rank->value == 0)
 				pPlayer->rank = g_rank.findEntryInRank( name, name );
 			else
@@ -244,8 +270,9 @@ void ClientUserInfoChanged_Post( edict_t *pEntity, char *infobuffer ) {
 		}
 	}
 	else if ( pPlayer->IsBot() ) {
+		pPlayer->pEdict = pEntity;
 		pPlayer->Connect( "127.0.0.1" );
-		pPlayer->PutInServer();
+		pPlayer->PutInServer(name);
 	}
 	RETURN_META(MRES_IGNORED);
 }

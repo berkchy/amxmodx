@@ -136,7 +136,7 @@ void Client_Damage(void* mValue){
 	}
     if( g_grenades.find(enemy , &pAttacker , &weapon ) )
         pAttacker->saveHit( mPlayer , weapon , damage, aim );
-	else if ( strcmp("grenade",STRING(enemy->v.classname))==0 ) // ? more checks ?
+	else if ( enemy && enemy->v.classname && strcmp("grenade",STRING(enemy->v.classname))==0 ) // ? more checks ?
 			weapon = CSW_C4;
   }
 }

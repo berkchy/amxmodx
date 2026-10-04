@@ -55,7 +55,7 @@ struct CPlayer {
 
 	void Init(  int pi, edict_t* pe );
 	void Connect(const char* ip );
-	void PutInServer();
+	void PutInServer(const char* nameOverride = 0);
 	void Disconnect();
 	void saveKill(CPlayer* pVictim, int weapon, int hs, int tk);
 	void saveHit(CPlayer* pVictim, int weapon, int damage, int aiming);
