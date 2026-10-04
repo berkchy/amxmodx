@@ -140,6 +140,10 @@ bool CDetour::CreateDetour()
 		return false;
 	}*/
 
+#if defined(__aarch64__)
+	/* x86 trampoline generator is not valid on ARM64 */
+	return false;
+#else
 	if (address != NULL)
 	{
 		detour_address = address;
@@ -195,6 +199,7 @@ jit_rewind:
 	*trampoline = detour_trampoline;
 
 	return true;
+#endif /* !__aarch64__ */
 }
 
 void CDetour::DeleteDetour()
