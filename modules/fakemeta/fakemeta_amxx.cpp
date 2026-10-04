@@ -31,8 +31,25 @@ CGameRules* InstallGameRules(IReGameHook_InstallGameRules *chain)
 	return static_cast<CGameRules*>(GameRulesRH);
 }
 
+static void DisableARM_FTZ(void)
+{
+#if defined(__aarch64__)
+	unsigned long long fpcr;
+	__asm__ volatile("mrs %0, fpcr" : "=r"(fpcr));
+	fpcr &= ~(1ULL << 24);
+	__asm__ volatile("msr fpcr, %0" :: "r"(fpcr));
+#elif defined(__arm__)
+	unsigned int fpscr;
+	__asm__ volatile("vmrs %0, fpscr" : "=r"(fpscr));
+	fpscr &= ~(1u << 24);
+	__asm__ volatile("vmsr fpscr, %0" :: "r"(fpscr));
+#endif
+}
+
 void OnAmxxAttach()
 {
+	DisableARM_FTZ();
+
 	initialze_offsets();
 	initialize_glb_offsets();
 
