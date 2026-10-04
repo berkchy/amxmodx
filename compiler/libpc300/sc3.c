@@ -1553,7 +1553,6 @@ restart:
         /* if the array index is a field from an enumeration, get the tag name
          * from the field and save the size of the field too.
          */
-        assert(lval2.sym==NULL || lval2.sym->dim.array.level==0);
         if (lval2.sym!=NULL && lval2.sym->dim.array.length>0 && sym->dim.array.level==0) {
           lval1->tag=lval2.sym->x.idxtag;
           lval1->constval=lval2.sym->dim.array.length;
