@@ -162,6 +162,12 @@ void *MemoryUtils::ResolveSymbol(void *handle, const char *symbol)
 #elif defined(__linux__)
 
 	void *addr = dlsym(handle, symbol);
+#if defined(__ANDROID__)
+	/* On Android, dlsym is reliable.
+	   The manual ELF fallback dereferences dlmap->l_name which
+	   can be NULL on bionic, causing SIGSEGV. */
+	return addr;
+#else
 
 	if (addr)
 	{
@@ -299,6 +305,8 @@ void *MemoryUtils::ResolveSymbol(void *handle, const char *symbol)
 
 	munmap(file_hdr, dlstat.st_size);
 	return symbol_entry ? symbol_entry->address : NULL;
+#endif /* !__ANDROID__ */
+	return NULL;
 
 #elif defined(__APPLE__)
 	
