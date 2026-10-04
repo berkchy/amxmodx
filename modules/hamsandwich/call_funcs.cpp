@@ -48,7 +48,7 @@ inline void *_GetFunction(void *pthis, int id)
 {
 	void **vtbl=GetVTable(pthis, Offsets.GetBase());
 
-	int **ivtbl=(int **)vtbl;
+	void **ivtbl=vtbl;
 	void *func=ivtbl[hooklist[id].vtid];
 
 	// Iterate through the hooks for the id, see if the function is found

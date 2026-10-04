@@ -44,8 +44,8 @@ public:
 		{
 			// original function is vtable[entry]
 			// to not make the compiler whine, cast vtable to int **
-			int **ivtable=(int **)vtable;
-			func=(void *)ivtable[entry];
+			void **ivtable=vtable;
+			func=ivtable[entry];
 
 			// now install a trampoline
 			// (int thiscall, int voidcall, int paramcount, void *extraptr)
@@ -59,7 +59,7 @@ public:
 			void *addr = (void *)ALIGN(&ivtable[entry]);
 			mprotect(addr,sysconf(_SC_PAGESIZE),PROT_READ|PROT_WRITE);
 #endif
-			ivtable[entry]=(int*)tramp;
+			ivtable[entry]=tramp;
 
 			size_t len=strlen(name);
 			ent=new char[len+1];
@@ -70,7 +70,7 @@ public:
 	~Hook()
 	{
 		// Insert the original function back into the vtable
-		int **ivtable=(int **)vtable;
+		void **ivtable=vtable;
 
 #if defined(_WIN32)
 		DWORD OldFlags;
@@ -80,7 +80,7 @@ public:
 		mprotect(addr,sysconf(_SC_PAGESIZE),PROT_READ|PROT_WRITE);
 #endif
 
-		ivtable[entry]=(int *)func;
+		ivtable[entry]=func;
 #if defined(_WIN32)
 		VirtualFree(tramp, 0, MEM_RELEASE);
 #elif defined(__linux__)

@@ -87,9 +87,8 @@ void CHamSpecialBotHandler::RegisterChecked(AMX *amx, int &func, const char *fun
 	pfwd->AddRef();
 
 	void **vtable = m_specialbot_vtable;
-	int **ivtable=(int **)vtable;
 
-	void *vfunction=(void *)ivtable[hooklist[func].vtid];
+	void *vfunction=vtable[hooklist[func].vtid];
 
 	for (size_t i = 0; i < hooks[func].length(); ++i)
 	{

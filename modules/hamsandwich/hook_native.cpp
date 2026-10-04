@@ -657,9 +657,9 @@ static cell AMX_NATIVE_CALL RegisterHam(AMX *amx, cell *params)
 		SpecialbotHandler.RegisterHamSpecialBot(amx, func, function.chars(), post, pfwd);
 	}
 
-	int **ivtable=(int **)vtable;
+	void **ivtable=vtable;
 
-	void *vfunction=(void *)ivtable[hooklist[func].vtid];
+	void *vfunction=ivtable[hooklist[func].vtid];
 
 	// Check the list of this function's hooks, see if the function we have is a hook
 
@@ -744,9 +744,9 @@ static cell AMX_NATIVE_CALL RegisterHamFromEntity(AMX *amx, cell *params)
 	Forward *pfwd = new Forward(fwd);
 	pfwd->AddRef();
 
-	int **ivtable=(int **)vtable;
+	void **ivtable=vtable;
 
-	void *vfunction=(void *)ivtable[hooklist[func].vtid];
+	void *vfunction=ivtable[hooklist[func].vtid];
 
 	// Check the list of this function's hooks, see if the function we have is a hook
 
