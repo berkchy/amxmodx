@@ -37,7 +37,6 @@
 
 #if defined LINUX || defined __FreeBSD__ || defined __OpenBSD__ || defined __APPLE__
   #include <sclinux.h>
-  #include <prefix.h> /* from BinReloc, see www.autopackage.org */
   #include <unistd.h>
 #endif
 

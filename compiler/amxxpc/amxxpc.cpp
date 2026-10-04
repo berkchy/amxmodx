@@ -49,6 +49,7 @@ int main(int argc, char **argv)
 #else
 # if defined(__linux__)
 	HINSTANCE lib = NULL;
+	dlopen("libm.so", RTLD_NOW | RTLD_GLOBAL);
 	if (FileExists("./amxxpc32.so"))
 		lib = dlmount("./amxxpc32.so");
 	else if (FileExists("./libamxxpc32.so"))
@@ -72,7 +73,9 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	COMPILER sc32 = (COMPILER)dlsym(lib, "Compile32");
+	COMPILER sc32 = (COMPILER)dlsym(lib, "Compile64");
+	if (!sc32)
+		sc32 = (COMPILER)dlsym(lib, "Compile32");
 	pc_printf = (PRINTF)dlsym(lib, "pc_printf");
 #endif //EMSCRIPTEN
 
@@ -125,7 +128,7 @@ int main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 		ReadFileIntoPl(&pl32, fp);
-		pl32.cellsize = 4;
+		pl32.cellsize = (char)sizeof(cell);
 		fclose(fp);
 	}
 
