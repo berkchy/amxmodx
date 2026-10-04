@@ -3362,7 +3362,17 @@ static int newfunc(char *firstname,int firsttag,int fpublic,int fstatic,int stoc
   short filenum;
   int state_id;
 
-  assert(litidx==0);    /* literal queue should be empty */
+#if PAWN_CELL_SIZE==32
+  assert(litidx==0);    /* literal queue should be empty (strict on 32-bit) */
+#else
+  /* On PAWN_CELL_SIZE==64 the literal queue may still reference a few
+   * trailing literals declared by the previous whole-module section (the
+   * literal pool is byte-budgeted per cell). Flush them instead of aborting
+   * the compile with "assert failed: litidx==0". The pool is reset below.
+   */
+  if (litidx!=0)
+    dumplits();         /* dump any pending literals into the data segment */
+#endif
   litidx=0;             /* clear the literal pool (should already be empty) */
   opertok=0;
   lastst=0;             /* no statement yet */
