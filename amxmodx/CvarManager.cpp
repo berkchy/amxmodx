@@ -83,7 +83,7 @@ void Cvar_DirectSet_Custom(struct cvar_s *var, const char *value, IRehldsHook_Cv
 				case CvarBind::CvarType_Float:
 				{
 					float fvalue = atof(var->string);
-					*bind->varAddress = amx_ftoc(fvalue);
+					{ REAL _widen = (REAL)(fvalue); *bind->varAddress = amx_ftoc(_widen); }
 					break;
 				}
 				case CvarBind::CvarType_String:
@@ -427,7 +427,7 @@ bool CvarManager::BindCvar(CvarInfo* info, CvarBind::CvarType type, AMX* amx, ce
 			*bind->varAddress = atoi(info->var->string);
 			break;
 		case CvarBind::CvarType_Float:
-			*bind->varAddress = amx_ftoc(info->var->value);
+			{ REAL _widen = (REAL)(info->var->value); *bind->varAddress = amx_ftoc(_widen); }
 			break;
 		case CvarBind::CvarType_String:
 			set_amxstring_simple(bind->varAddress, info->var->string, bind->varLength);

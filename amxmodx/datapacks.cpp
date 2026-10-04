@@ -121,7 +121,7 @@ static cell AMX_NATIVE_CALL ReadPackFloat(AMX* amx, cell* params)
 
 	float value = d->ReadFloat();
 
-	return amx_ftoc(value);
+	{ REAL _widen = (REAL)(value); return amx_ftoc(_widen); }
 }
 
 static cell AMX_NATIVE_CALL ReadPackString(AMX* amx, cell* params)

@@ -182,7 +182,7 @@ static cell AMX_NATIVE_CALL get_cvar_float(AMX *amx, cell *params)
 
 	CvarInfo* info = g_CvarManager.FindCvar(name);
 
-	return info ? amx_ftoc(info->var->value) : 0;
+	{ REAL _widen = info ? (REAL)info->var->value : (REAL)0; return amx_ftoc(_widen); }
 }
 
 // get_cvar_num(const cvarname[])
@@ -304,7 +304,7 @@ static cell AMX_NATIVE_CALL get_pcvar_float(AMX *amx, cell *params)
 		return 0;
 	}
 
-	return amx_ftoc(ptr->value);
+	{ REAL _widen = (REAL)(ptr->value); return amx_ftoc(_widen); }
 }
 
 // get_pcvar_num(pcvar)
@@ -369,7 +369,7 @@ static cell AMX_NATIVE_CALL get_pcvar_bounds(AMX *amx, cell *params)
 			return 0;
 	}
 
-	*get_amxaddr(amx, params[3]) = amx_ftoc(bound);
+	{ REAL _widen = (REAL)(bound); *get_amxaddr(amx, params[3]) = amx_ftoc(_widen); }
 
 	return hasBound;
 }

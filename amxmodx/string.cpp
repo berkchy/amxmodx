@@ -478,7 +478,7 @@ static cell AMX_NATIVE_CALL amx_strtof(AMX *amx, cell *params) /* 2 param */
 
 	*endPos = pEnd - pString;
 
-	return amx_ftoc(result);
+	{ REAL _widen = (REAL)(result); return amx_ftoc(_widen); }
 }
 
 static cell AMX_NATIVE_CALL numtostr(AMX *amx, cell *params) /* 3 param */

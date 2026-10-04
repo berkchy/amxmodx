@@ -2652,7 +2652,7 @@ static cell AMX_NATIVE_CALL read_argv_float(AMX *amx, cell *params) /* 1 param *
 	const char *value = g_fakecmd.notify ? ((argc >= 1 && argc < 3 && g_fakecmd.argv[argc] != nullptr) ? g_fakecmd.argv[argc] : "") : CMD_ARGV(argc);
 	float flValue = atof(value);
 
-	return amx_ftoc(flValue);
+	{ REAL _widen = (REAL)(flValue); return amx_ftoc(_widen); }
 }
 
 static cell AMX_NATIVE_CALL read_args(AMX *amx, cell *params) /* 2 param */
