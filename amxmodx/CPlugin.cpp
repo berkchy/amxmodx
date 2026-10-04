@@ -68,6 +68,10 @@ void CPluginMngr::Finalize()
 // native registered after that is still a null pointer in the caller and the
 // call jumps to address 0 - a SIGSEGV inside plugin_precache with no useful
 // backtrace. Re-resolve the entries that are still unresolved.
+// Its definition sits further down in this file, so declare it before the
+// first use.
+static cell AMX_NATIVE_CALL invalid_native(AMX *amx, cell *params);
+
 void CPluginMngr::RefreshNatives()
 {
 	AMX_NATIVE_INFO *table = BuildNativeTable();
@@ -82,7 +86,27 @@ void CPluginMngr::RefreshNatives()
 			// amx_Register only fills entries that are still zero, and reports
 			// AMX_ERR_NOTFOUND for the ones nobody has registered - that is
 			// expected here and must not fail the plugin.
-			amx_Register(a->getAMX(), table, -1);
+			AMX *amx = a->getAMX();
+			AMX_HEADER *hdr = (AMX_HEADER *)amx->base;
+
+			// amx_Register() only fills entries whose address is still zero
+			// and the stub is not zero, so clear the stubbed entries first
+			// or the retry could never resolve them
+			int entries = (hdr->libraries - hdr->natives) / hdr->defsize;
+			AMX_FUNCSTUB *stub = (AMX_FUNCSTUB *)((unsigned char *)hdr + hdr->natives);
+
+			for (int i = 0; i < entries; i++)
+			{
+				if ((AMX_NATIVE)stub->address == invalid_native)
+					stub->address = 0;
+
+				stub = (AMX_FUNCSTUB *)((unsigned char *)stub + hdr->defsize);
+			}
+
+			amx_Register(amx, table, -1);
+
+			// Whatever nobody has registered stays on the stub
+			amx_RegisterToAny(amx, invalid_native);
 		}
 	}
 
@@ -454,6 +478,13 @@ void CPluginMngr::CPlugin::Finalize()
 				// degistiyse) unresolved girdileri yeniden cozuyor.
 				sprintf(buffer, "Plugin uses a function that is not registered yet (name \"%s\") - resolving after plugin_init", no_function);
 				AMXXLOG_Log("[NX] Plugin \"%s\": %s", name.chars(), buffer);
+
+				// Never leave a null native behind: an entry that stays at
+				// address 0 is jumped to when it is called, which is a SIGSEGV
+				// inside plugin_precache with no useful backtrace. The stub turns
+				// a late call into a normal AMXX error, and RefreshNatives()
+				// swaps it for the real address once it exists.
+			amx_RegisterToAny(&amx, invalid_native);
 			} else {
 				amx_RegisterToAny(&amx, invalid_native);
 			}
