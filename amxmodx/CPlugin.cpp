@@ -60,6 +60,35 @@ void CPluginMngr::Finalize()
 	m_Finalized = true;
 }
 
+// Zombie Plague-style plugin sets register their natives in one plugin's
+// forward and call them from another plugin's forward, relying on load order:
+// the main plugin's plugin_precache() calls plugin_natives(), and the class
+// plugin's plugin_precache() then calls zp_register_zombie_class(). AMXX only
+// wires plugin natives into other plugins' images when a plugin is loaded, so a
+// native registered after that is still a null pointer in the caller and the
+// call jumps to address 0 - a SIGSEGV inside plugin_precache with no useful
+// backtrace. Re-resolve the entries that are still unresolved.
+void CPluginMngr::RefreshNatives()
+{
+	AMX_NATIVE_INFO *table = BuildNativeTable();
+
+	if (table == NULL)
+		return;
+
+	for (CPlugin *a = head; a != NULL; a = a->next)
+	{
+		if (a->getStatusCode() == ps_running)
+		{
+			// amx_Register only fills entries that are still zero, and reports
+			// AMX_ERR_NOTFOUND for the ones nobody has registered - that is
+			// expected here and must not fail the plugin.
+			amx_Register(a->getAMX(), table, -1);
+		}
+	}
+
+	delete [] table;
+}
+
 int CPluginMngr::loadPluginsFromFile(const char* filename, bool warn)
 {
 	char file[PLATFORM_MAX_PATH];

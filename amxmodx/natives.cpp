@@ -486,6 +486,11 @@ static cell AMX_NATIVE_CALL register_native(AMX *amx, cell *params)
 	return 1;
 }
 
+int GetRegisteredNativesCount()
+{
+	return (int)g_RegNatives.length();
+}
+
 void ClearPluginLibraries()
 {
 	ClearLibraries(LibSource_Plugin);

@@ -38,6 +38,10 @@ extern "C" int amxx_DynaFunc(AMX *amx, cell *params);
 extern "C" int amxx_DynaCodesize();
 
 AMX_NATIVE_INFO *BuildNativeTable();
+
+// How many natives plugins have registered so far. The forward runner compares
+// this around each plugin to notice that new ones just became callable.
+int GetRegisteredNativesCount();
 void ClearPluginLibraries();
 
 //I couldn't resist :)
