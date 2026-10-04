@@ -38,6 +38,7 @@
 	#include <unistd.h>
 	#include <sys/stat.h>
 	#include <sys/types.h>
+	#include <dlfcn.h>
 
 	#define PAGE_SIZE			4096
 	#define PAGE_ALIGN_UP(x)	((x + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
