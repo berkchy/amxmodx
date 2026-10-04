@@ -37,7 +37,17 @@
 #include "detourhelpers.h"
 #include <stdint.h>
 
-typedef int32_t cell;
+typedef int32_t cell_t32;
+typedef int64_t cell_t64;
+#ifdef PAWN_CELL_SIZE
+  #if PAWN_CELL_SIZE == 64
+    typedef cell_t64 cell;
+  #else
+    typedef cell_t32 cell;
+  #endif
+#else
+  typedef cell_t32 cell;
+#endif
 
 /**
  * CDetours class for SourceMod Extensions by pRED*
