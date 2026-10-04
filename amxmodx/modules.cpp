@@ -997,8 +997,10 @@ int loadModules(const char* filename, PLUG_LOADTIME now)
 		if (sscanf(line, "%s", moduleName) == EOF)
 			continue;
 
+		print_srvconsole("[NX] module 30 loading %s\n", moduleName);
 		if (LoadModule(moduleName, now, simplify))
 			loaded++;
+		print_srvconsole("[NX] module 32 done %s\n", moduleName);
 	}
 
 	fclose(fp);

@@ -1679,6 +1679,7 @@ C_DLLEXPORT	int	Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	g_coloredmenus = ColoredMenus(g_mod_name.chars()); // whether or not to use colored menus
 
 	// ###### Print short GPL
+	print_srvconsole("[NX] boot 20 attach-enter\n");
 	print_srvconsole("\n   AMX Mod X version %s Copyright (c) 2004-2015 AMX Mod X Development Team \n"
 					 "   AMX Mod X comes with ABSOLUTELY NO WARRANTY; for details type `amxx gpl'.\n", AMXX_VERSION);
 	print_srvconsole("   This is free software and you are welcome to redistribute it under \n"
@@ -1701,18 +1702,23 @@ C_DLLEXPORT	int	Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	}
 
 	// ###### Initialize logging here
+	print_srvconsole("[NX] boot 22 coreini-done\n");
 	g_log_dir = get_localinfo("amxx_logs", "addons/amxmodx/logs");
 	g_log.SetLogType("amxx_logging");
 
 	// ###### Now attach metamod modules
 	// This will also call modules Meta_Query and Meta_Attach functions
+	print_srvconsole("[NX] boot 24 logtype-done\n");
 	loadModules(get_localinfo("amxx_modules", "addons/amxmodx/configs/modules.ini"), now);
+	print_srvconsole("[NX] boot 26 modules-done\n");
 
 	GET_HOOK_TABLES(PLID, &g_pEngTable, NULL, NULL);
 
 	FlagMan.SetFile("cmdaccess.ini");
 
+	print_srvconsole("[NX] boot 27 startupcfg-done\n");
 	ConfigManager.OnAmxxStartup();
+	print_srvconsole("[NX] boot 29 attach-done\n");
 
 	if (RehldsApi_Init())
 	{
