@@ -80,6 +80,14 @@ void print_srvconsole(const char *fmt, ...)
 	SERVER_PRINT(string);
 }
 
+// Called from assert_shim.c when an assert() fires. The shim writes to
+// stderr (logcat) as well; this puts the same message in engine.log, which
+// is the log a player can actually send us.
+extern "C" void amxx_assert_report(const char *msg)
+{
+	print_srvconsole("%s", msg);
+}
+
 #if defined BINLOG_ENABLED
 void BinLog_LogNative(AMX *amx, int native, int params)
 {
